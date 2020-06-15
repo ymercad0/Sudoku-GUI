@@ -81,5 +81,7 @@ board = Sudoku([
     [0, 0, 0, 4, 1, 9, 0, 0, 5],
     [0, 0, 0, 0, 8, 0, 0, 7, 9]
         ])
-board.solve()
-board.print_board() #prints the board at the end as a reformated 9x9 array
+
+if __name__ == '__main__':
+    board.solve()
+    board.print_board() #prints the board at the end as a reformated 9x9 array
