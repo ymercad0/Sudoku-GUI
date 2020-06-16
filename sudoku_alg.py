@@ -53,6 +53,10 @@ class Sudoku:
             return True
         return False
 
+    def get_board(self):
+        '''Returns the board not as an instance of Sudoku but as a 2D array for easy access'''
+        return self.board
+
     def solve(self): #recursive, once you get to the end of the board it's solved
         '''Solves the Sudoku board, backtrack alg'''
         empty = self.find_empty()
