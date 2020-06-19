@@ -4,6 +4,16 @@ pygame.init()
 
 class Board:
     '''A sudoku board made out of Tiles'''
+    def __init__(self, window):
+        self.window = window
+        self.tiles = []
+
+    def fill_board(self):
+        '''Fills the board with Tiles'''
+        for i in range(9):
+            for j in range(9):
+                self.tiles.append(Tile(0, self.window, i*61, j*61))
+                self.tiles[i][j].draw()
 
 class Tile:
     '''Represents each white tile/box on the grid'''
@@ -28,10 +38,8 @@ def main():
     icon = pygame.image.load("icon.png")  # change window image
     pygame.display.set_icon(icon)
 
-    for i in range (9):
-        for j in range (9):
-            x = Tile(0,screen,0,1)
-            x.draw()
+    y = Board(screen)
+    y.fill_board()
 
     running = True
     while running:
