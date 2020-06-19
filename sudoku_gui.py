@@ -5,14 +5,25 @@ pygame.init()
 class Board:
     '''A sudoku board made out of Tiles'''
     def __init__(self, window):
+        self.board = Sudoku([
+            [5, 3, 0, 0, 7, 0, 0, 0, 0],
+            [6, 0, 0, 1, 9, 5, 0, 0, 0],
+            [0, 9, 8, 0, 0, 0, 0, 6, 0],
+            [8, 0, 0, 0, 6, 0, 0, 0, 3],
+            [4, 0, 0, 8, 0, 3, 0, 0, 1],
+            [7, 0, 0, 0, 2, 0, 0, 0, 6],
+            [0, 6, 0, 0, 0, 0, 2, 8, 0],
+            [0, 0, 0, 4, 1, 9, 0, 0, 5],
+            [0, 0, 0, 0, 8, 0, 0, 7, 9]
+        ])
         self.window = window
-        self.tiles = []
+        self.tiles = [[0 for i in range(9)] for j in range(9)]
 
     def fill_board(self):
         '''Fills the board with Tiles'''
         for i in range(9):
             for j in range(9):
-                self.tiles.append(Tile(0, self.window, i*61, j*61))
+                self.tiles[i][j] = Tile(self.board.get_board()[i][j], self.window, i*60, j*60)
                 self.tiles[i][j].draw()
 
 class Tile:
@@ -28,7 +39,7 @@ class Tile:
 
     def draw(self):
         '''Draws a tile on the board'''
-        pygame.draw.rect(self.window, (255,255,255), self.rect)
+        pygame.draw.rect(self.window, (255,255,255), self.rect, 1)
         pygame.display.update()
         
 def main():
@@ -43,7 +54,7 @@ def main():
 
     running = True
     while running:
-        for event in pygame.event.get(): #loops through all the pygame events
-            if event.type == pygame.QUIT: #if it's a pygame window quit event, pygame stops running
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 running = False
 main()
