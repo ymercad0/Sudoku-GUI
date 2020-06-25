@@ -20,7 +20,7 @@ class Board:
         self.tiles = [[0 for i in range(9)] for j in range(9)]
 
     def draw_board(self):
-        '''Fills the board with Tiles'''
+        '''Fills the board with Tiles and renders their values'''
         for i in range(9):
             for j in range(9):
                 if j%3 == 0 and j != 0: #vertical lines
@@ -31,9 +31,10 @@ class Board:
                     pygame.draw.line(self.window, (0, 0, 0), (0, ((i//3)*180)+1), (540, ((i//3)*180)+1), 5)
                     pygame.display.flip()
 
-                self.tiles[i][j] = Tile(self.board.get_board()[i][j], self.window, i*60, j*60) #draw a single tile
+                self.tiles[i][j] = Tile(self.board.get_board()[i][j], self.window, i*60, j*60) #each tile has a distance of 60 units to the other
                 self.tiles[i][j].draw()
-                self.tiles[i][j].display()
+                if self.board.get_board()[i][j] != 0: #don't draw 0s on the grid
+                    self.tiles[i][j].display((20+(j*60), (5+(i*60))))  #20,5 are the coordinates of the first tile
 
 class Tile:
     '''Represents each white tile/box on the grid'''
@@ -51,20 +52,19 @@ class Tile:
         pygame.draw.rect(self.window, (0,0,0), self.rect, 1)
         pygame.display.flip()
 
-    def display(self):
+    def display(self, position):
         '''Displays a number on that tile'''
-        font = pygame.font.SysFont('arial', 50)
-        text = font.render(str(self.value), True, (0, 0, 0))
-        rect = text.get_rect() #Returns a new rectangle covering the entire surface
-        self.window.blit(text, rect)
-        pygame.display.update()
+        font = pygame.font.SysFont('lato', 40)
+        text = font.render(str(self.value), True, (0, 0, 0)) #True = antialiasing
+        self.window.blit(text, position)
+        pygame.display.flip()
 
 def main():
     '''Runs the main Sudoku GUI/Game'''
-    screen = pygame.display.set_mode((540, 540))  # make a screen
+    screen = pygame.display.set_mode((540, 540))  #make a screen
     screen.fill((255, 255, 255))
     pygame.display.set_caption("Sudoku Solver")
-    icon = pygame.image.load("icon.png")  # change window image
+    icon = pygame.image.load("icon.png")
     pygame.display.set_icon(icon)
 
     y = Board(screen)
