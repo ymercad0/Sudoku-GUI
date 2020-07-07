@@ -32,7 +32,7 @@ class Board:
                 self.tiles[i][j].draw((0,0,0), 1)
 
                 if self.tiles[i][j].value != 0: #don't draw 0s on the grid
-                    self.tiles[i][j].display((20+(j*60), (5+(i*60))))  #20,5 are the coordinates of the first tile
+                    self.tiles[i][j].display((20+(j*60), (5+(i*60))), (0, 0, 0))  #20,5 are the coordinates of the first tile
 
     def deselect(self, tile):
         '''Deselects every tile except the one currently clicked'''
@@ -62,10 +62,10 @@ class Tile:
         '''Draws a tile on the board'''
         pygame.draw.rect(self.window, color, self.rect, thickness)
 
-    def display(self, position):
+    def display(self, position, color):
         '''Displays a number on that tile'''
         font = pygame.font.SysFont('lato', 40)
-        text = font.render(str(self.value), True, (0, 0, 0)) #True = antialiasing
+        text = font.render(str(self.value), True, color) #True = antialiasing
         self.window.blit(text, position)
 
     def clicked(self, mousePos):
@@ -83,7 +83,6 @@ def main():
     pygame.display.set_icon(icon)
 
     board = Board(screen)
-    board.draw_board()
 
     running = True
     while running:
@@ -96,7 +95,39 @@ def main():
                 for i in range(9):
                     for j in range (9):
                         if board.tiles[i][j].clicked(mousePos):
+                            selected = i,j
                             board.deselect(board.tiles[i][j]) #deselects every tile except the one currently clicked
+
+            elif event.type == pygame.KEYDOWN: #when a keyboard key is pressed
+                if event.key == pygame.K_1:
+                    key = 1
+
+                if event.key == pygame.K_2:
+                   key = 2
+
+                if event.key == pygame.K_3:
+                    key = 3
+
+                if event.key == pygame.K_4:
+                    key = 4
+
+                if event.key == pygame.K_5:
+                    key = 5
+
+                if event.key == pygame.K_6:
+                    key = 6
+
+                if event.key == pygame.K_7:
+                    key = 7
+
+                if event.key == pygame.K_8:
+                    key = 8
+
+                if event.key == pygame.K_9:
+                    key = 9
+
+                elif event.key == pygame.K_RETURN:
+                    board.tiles[selected[1]][selected[0]].value = key
 
         board.redraw()
         pygame.display.flip()
