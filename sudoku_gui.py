@@ -103,6 +103,7 @@ def main():
                             board.deselect(board.tiles[i][j]) #deselects every tile except the one currently clicked
 
             elif event.type == pygame.KEYDOWN: #when a keyboard key is pressed
+                key = None #reset key value at each press
                 if board.board.get_board()[selected[1]][selected[0]] == 0:
                     if event.key == pygame.K_1:
                         key = 1
@@ -141,14 +142,12 @@ def main():
                         keyDict[selected] = 9
 
                     elif event.key == pygame.K_RETURN:
-                        if len(keyDict) != 0:
+                        if selected in keyDict:
                             board.tiles[selected[1]][selected[0]].value = keyDict[selected] #assigns current grid value not to current key but to curent greyed out highlighted value
                             del keyDict[selected]
                             break
-                        try: #in case user presses down on an empty tile at the start
+                        if key != None: #in case user presses down on an empty tile at the start
                             board.tiles[selected[1]][selected[0]].value = key
-                        except UnboundLocalError:
-                            continue
 
         board.redraw(keyDict)
         pygame.display.flip()
