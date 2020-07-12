@@ -67,7 +67,7 @@ class Sudoku:
             if self.valid(nums+1): #if the number is valid in that grid position
                 self.board[self.pos[0]][self.pos[1]] = nums+1
                 if self.solve(): #recursive step
-                    return True #after assigning a number, if there's no empty spots, returns True
+                    return self.board #after assigning a number, if there's no empty spots, returns True
 
                 del self.history[len(self.history) - 1]  #goes back to the last spot, not current
                 self.pos = self.history[len(self.history) - 1]  # reassign current position

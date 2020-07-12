@@ -16,6 +16,8 @@ class Board:
             [0, 0, 0, 4, 1, 9, 0, 0, 5],
             [0, 0, 0, 0, 8, 0, 0, 7, 9]
         ])
+        self.solvedBoard = Sudoku([row[:] for row in self.board.get_board()])
+        self.solvedBoard.solve() #so that self.board isn't modified
         self.tiles = [[Tile(self.board.get_board()[i][j], window, i*60, j*60) for j in range(9)] for i in range(9)]
         self.window = window
 
@@ -47,10 +49,10 @@ class Board:
         self.draw_board()
         for i in range(9):
             for j in range(9):
-                if self.tiles[i][j].selected:  # draws the green border on selected tiles and displays greyed out num
+                if self.tiles[i][j].selected:  #draws the green border on selected tiles `1
                     self.tiles[i][j].draw((50, 205, 50), 4)
 
-        if len(keys) != 0: #draws inputs that the user places on board but not their final value picls on that tile
+        if len(keys) != 0: #draws inputs that the user places on board but not their final value on that tile
             for value in keys:
                 self.tiles[value[0]][value[1]].display(keys[value], (20+(value[0]*60), (5+(value[1]*60))), (128, 128, 128))
 class Tile:
@@ -86,6 +88,7 @@ def main():
     pygame.display.set_icon(icon)
 
     board = Board(screen)
+    selected = -1,-1 #NoneType error when selected = None, easier to just format as a tuple whose value will never be used
     keyDict = {}
 
     running = True
@@ -102,52 +105,53 @@ def main():
                             selected = i,j
                             board.deselect(board.tiles[i][j]) #deselects every tile except the one currently clicked
 
-            elif event.type == pygame.KEYDOWN: #when a keyboard key is pressed
-                key = None #reset key value at each press
-                if board.board.get_board()[selected[1]][selected[0]] == 0:
+            elif event.type == pygame.KEYDOWN:
+                if board.board.get_board()[selected[1]][selected[0]] == 0 and selected != (-1,-1):
                     if event.key == pygame.K_1:
-                        key = 1
                         keyDict[selected] = 1
 
                     if event.key == pygame.K_2:
-                        key = 2
                         keyDict[selected] = 2
 
                     if event.key == pygame.K_3:
-                        key = 3
                         keyDict[selected] = 3
 
                     if event.key == pygame.K_4:
-                        key = 4
                         keyDict[selected] = 4
 
                     if event.key == pygame.K_5:
-                        key = 5
                         keyDict[selected] = 5
 
                     if event.key == pygame.K_6:
-                        key = 6
                         keyDict[selected] = 6
 
                     if event.key == pygame.K_7:
-                        key = 7
                         keyDict[selected] = 7
 
                     if event.key == pygame.K_8:
-                        key = 8
                         keyDict[selected] = 8
 
                     if event.key == pygame.K_9:
-                        key = 9
                         keyDict[selected] = 9
+
+                    elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:  # clears tile out
+                        if selected in keyDict:
+                            board.tiles[selected[1]][selected[0]].value = 0
+                            del keyDict[selected]
 
                     elif event.key == pygame.K_RETURN:
                         if selected in keyDict:
-                            board.tiles[selected[1]][selected[0]].value = keyDict[selected] #assigns current grid value not to current key but to curent greyed out highlighted value
+                            if keyDict[selected] != board.solvedBoard.get_board()[selected[1]][selected[0]]: #clear tile when incorrect value is inputted
+                                board.tiles[selected[1]][selected[0]].value = 0
+                                del keyDict[selected]
+                                break
+                            #valid and correct entry into cell
+                            board.tiles[selected[1]][selected[0]].value = keyDict[selected] #assigns current grid value
+                            board.board.get_board()[selected[1]][selected[0]] = keyDict[selected] #assigns to actual board so that the correct value can't be modified
                             del keyDict[selected]
-                            break
-                        if key != None: #in case user presses down on an empty tile at the start
-                            board.tiles[selected[1]][selected[0]].value = key
+
+                    elif event.key == pygame.K_SPACE:
+                        print("y")
 
         board.redraw(keyDict)
         pygame.display.flip()
