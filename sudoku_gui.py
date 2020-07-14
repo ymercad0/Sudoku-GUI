@@ -55,6 +55,12 @@ class Board:
         if len(keys) != 0: #draws inputs that the user places on board but not their final value on that tile
             for value in keys:
                 self.tiles[value[0]][value[1]].display(keys[value], (20+(value[0]*60), (5+(value[1]*60))), (128, 128, 128))
+
+    def visualSolve(self):
+        '''Showcases how the board is solved via backtracking'''
+        for i in range(9):
+            for j in range(9):
+                pass
 class Tile:
     '''Represents each white tile/box on the grid'''
     def __init__(self, value, window, x1, y1):
@@ -93,11 +99,17 @@ def main():
 
     running = True
     while running:
+        if board.board.get_board() == board.solvedBoard.get_board(): #user has solved the board
+            for i in range(9):
+                for j in range(9):
+                    board.tiles[i][j].selected = False
+                    running = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-            elif event.type == pygame.MOUSEBUTTONUP:
+            elif event.type == pygame.MOUSEBUTTONUP: #allow clicks only while the board hasn't been solved
                 mousePos = pygame.mouse.get_pos()
                 for i in range(9):
                     for j in range (9):
@@ -150,10 +162,20 @@ def main():
                             board.board.get_board()[selected[1]][selected[0]] = keyDict[selected] #assigns to actual board so that the correct value can't be modified
                             del keyDict[selected]
 
-                    elif event.key == pygame.K_SPACE:
-                        print("y")
+                if event.key == pygame.K_SPACE:
+                    for i in range(9):
+                        for j in range(9):
+                            board.tiles[i][j].selected = False
+                    board.visualSolve()
+                    running = False
 
         board.redraw(keyDict)
         pygame.display.flip()
+
+    if board.board.get_board() == board.solvedBoard.get_board():
+        while True: #another running loop so that the program ONLY closes when user closes program
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
 main()
 pygame.quit()
