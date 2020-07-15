@@ -1,5 +1,6 @@
 from sudoku_alg import Sudoku
 import pygame
+import sys
 pygame.init()
 
 class Board:
@@ -52,6 +53,12 @@ class Board:
                 if self.tiles[i][j].selected:  #draws the green border on selected tiles `1
                     self.tiles[i][j].draw((50, 205, 50), 4)
 
+                elif self.tiles[i][j].correct:  #draws the dark green border on correct tiles
+                    self.tiles[i][j].draw((34,139,34), 4)
+
+                elif self.tiles[i][j].incorrect:
+                    self.tiles[i][j].draw((255, 0, 0), 4)
+
         if len(keys) != 0: #draws inputs that the user places on board but not their final value on that tile
             for value in keys:
                 self.tiles[value[0]][value[1]].display(keys[value], (20+(value[0]*60), (5+(value[1]*60))), (128, 128, 128))
@@ -60,7 +67,8 @@ class Board:
         '''Showcases how the board is solved via backtracking'''
         for i in range(9):
             for j in range(9):
-                pass
+                if self.board.get_board()[j][i] == self.solvedBoard.get_board()[j][i]:
+                    self.tiles[i][j].correct = True
 class Tile:
     '''Represents each white tile/box on the grid'''
     def __init__(self, value, window, x1, y1):
@@ -68,6 +76,8 @@ class Tile:
         self.window = window
         self.rect = pygame.Rect(x1, y1, 60, 60) #dimensions for the rectangle
         self.selected = False
+        self.correct = False
+        self.incorrect = False
 
     def draw(self, color, thickness):
         '''Draws a tile on the board'''
@@ -107,7 +117,7 @@ def main():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                sys.exit() #so that it doesnt go to the outer run loop
 
             elif event.type == pygame.MOUSEBUTTONUP: #allow clicks only while the board hasn't been solved
                 mousePos = pygame.mouse.get_pos()
@@ -172,10 +182,9 @@ def main():
         board.redraw(keyDict)
         pygame.display.flip()
 
-    if board.board.get_board() == board.solvedBoard.get_board():
-        while True: #another running loop so that the program ONLY closes when user closes program
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    return
+    while True: #another running loop so that the program ONLY closes when user closes program
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return
 main()
 pygame.quit()
