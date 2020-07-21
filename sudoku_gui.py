@@ -1,22 +1,23 @@
 from sudoku_alg import Sudoku
+from sys import exit
 import pygame
-import sys
+import time
 pygame.init()
 
 class Board:
     '''A sudoku board made out of Tiles'''
     def __init__(self, window):
         self.board = Sudoku([
-            [5, 3, 0, 0, 7, 0, 0, 0, 0],
-            [6, 0, 0, 1, 9, 5, 0, 0, 0],
-            [0, 9, 8, 0, 0, 0, 0, 6, 0],
-            [8, 0, 0, 0, 6, 0, 0, 0, 3],
-            [4, 0, 0, 8, 0, 3, 0, 0, 1],
-            [7, 0, 0, 0, 2, 0, 0, 0, 6],
-            [0, 6, 0, 0, 0, 0, 2, 8, 0],
-            [0, 0, 0, 4, 1, 9, 0, 0, 5],
-            [0, 0, 0, 0, 8, 0, 0, 7, 9]
-        ])
+        [0, 3, 0, 0, 1, 0, 0, 6, 0],
+        [0, 2, 0, 0, 0, 4, 0, 0, 0],
+        [1, 0, 0, 0, 0, 3, 5, 0, 0],
+        [3, 0, 0, 0, 9, 0, 0, 0, 0],
+        [8, 6, 0, 0, 0, 0, 0, 4, 1],
+        [0, 0, 0, 0, 7, 0, 0, 0, 8],
+        [0, 0, 5, 9, 0, 0, 0, 0, 2],
+        [0, 0, 0, 1, 0, 0, 0, 9, 0],
+        [0, 4, 0, 0, 8, 0, 0, 5, 0]
+    ])
         self.solvedBoard = Sudoku([row[:] for row in self.board.get_board()])
         self.solvedBoard.solve() #so that self.board isn't modified
         self.tiles = [[Tile(self.board.get_board()[i][j], window, i*60, j*60) for j in range(9)] for i in range(9)]
@@ -50,25 +51,44 @@ class Board:
         self.draw_board()
         for i in range(9):
             for j in range(9):
-                if self.tiles[i][j].selected:  #draws the green border on selected tiles `1
-                    self.tiles[i][j].draw((50, 205, 50), 4)
+                if self.tiles[j][i].selected:  #draws the green border on selected tiles
+                    self.tiles[j][i].draw((50, 205, 50), 4)
 
-                elif self.tiles[i][j].correct:  #draws the dark green border on correct tiles
-                    self.tiles[i][j].draw((34,139,34), 4)
+                elif self.tiles[i][j].correct:
+                    self.tiles[j][i].draw((34, 139, 34), 4)
 
                 elif self.tiles[i][j].incorrect:
-                    self.tiles[i][j].draw((255, 0, 0), 4)
+                    self.tiles[j][i].draw((255, 0, 0), 4)
 
         if len(keys) != 0: #draws inputs that the user places on board but not their final value on that tile
             for value in keys:
                 self.tiles[value[0]][value[1]].display(keys[value], (20+(value[0]*60), (5+(value[1]*60))), (128, 128, 128))
+        pygame.display.flip()
 
     def visualSolve(self):
         '''Showcases how the board is solved via backtracking'''
-        for i in range(9):
-            for j in range(9):
-                if self.board.get_board()[j][i] == self.solvedBoard.get_board()[j][i]:
-                    self.tiles[i][j].correct = True
+        empty = self.board.find_empty()
+        if not empty:
+            return True
+
+        for nums in range(9):
+            if self.board.valid((empty[0],empty[1]), nums+1):
+                self.board.get_board()[empty[0]][empty[1]] = nums+1
+                self.tiles[empty[0]][empty[1]].value = nums+1
+                self.tiles[empty[0]][empty[1]].correct = True
+                pygame.time.delay(63) #show tiles at a slower rate
+                self.redraw({})
+
+                if self.visualSolve():
+                    return True
+
+                self.board.get_board()[empty[0]][empty[1]] = 0
+                self.tiles[empty[0]][empty[1]].value = 0
+                self.tiles[empty[0]][empty[1]].incorrect = True
+                self.tiles[empty[0]][empty[1]].correct = False
+                pygame.time.delay(63)
+                self.redraw({})
+
 class Tile:
     '''Represents each white tile/box on the grid'''
     def __init__(self, value, window, x1, y1):
@@ -117,7 +137,7 @@ def main():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit() #so that it doesnt go to the outer run loop
+                exit() #so that it doesnt go to the outer run loop
 
             elif event.type == pygame.MOUSEBUTTONUP: #allow clicks only while the board hasn't been solved
                 mousePos = pygame.mouse.get_pos()
@@ -176,11 +196,16 @@ def main():
                     for i in range(9):
                         for j in range(9):
                             board.tiles[i][j].selected = False
+                    keyDict = {}  # clear keyDict out
+                    board.redraw(keyDict)
                     board.visualSolve()
+                    for i in range(9):
+                        for j in range(9):
+                            board.tiles[i][j].correct = False
+                            board.tiles[i][j].incorrect = False #reset tiles
                     running = False
 
         board.redraw(keyDict)
-        pygame.display.flip()
 
     while True: #another running loop so that the program ONLY closes when user closes program
         for event in pygame.event.get():
