@@ -53,7 +53,7 @@ class Board:
         self.draw_board()
         for i in range(9):
             for j in range(9):
-                if self.tiles[j][i].selected:  #draws the green border on selected tiles
+                if self.tiles[j][i].selected:  #draws the border on selected tiles
                     self.tiles[j][i].draw((50, 205, 50), 4)
 
                 elif self.tiles[i][j].correct:
@@ -111,7 +111,7 @@ class Board:
 class Tile:
     '''Represents each white tile/box on the grid'''
     def __init__(self, value, window, x1, y1):
-        self.value = value #value of the num on this grid
+        self.value = value
         self.window = window
         self.rect = pygame.Rect(x1, y1, 60, 60) #dimensions for the rectangle
         self.selected = False
@@ -220,8 +220,7 @@ def main():
                     for i in range(9):
                         for j in range(9):
                             board.tiles[i][j].selected = False
-                    keyDict = {}  # clear keyDict out
-                    board.redraw(keyDict, wrong, passedTime)
+                    keyDict = {}  #clear keyDict out
                     board.visualSolve(wrong, passedTime)
                     for i in range(9):
                         for j in range(9):
