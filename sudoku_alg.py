@@ -78,4 +78,4 @@ if __name__ == '__main__':
         [0, 4, 0, 0, 8, 0, 0, 5, 0]
     ])
     board.solve()
-    board.print_board() #prints the board at the end as a reformated 9x9 array
+    board.print_board() 
