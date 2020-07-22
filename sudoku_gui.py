@@ -37,6 +37,8 @@ class Board:
 
                 if self.tiles[i][j].value != 0: #don't draw 0s on the grid
                     self.tiles[i][j].display(self.tiles[i][j].value, (20+(j*60), (5+(i*60))), (0, 0, 0))  #20,5 are the coordinates of the first tile
+        #bottom-most line
+        pygame.draw.line(self.window, (0, 0, 0), (0, ((i+1) // 3) * 180), (540, ((i+1) // 3) * 180), 4)
 
     def deselect(self, tile):
         '''Deselects every tile except the one currently clicked'''
@@ -45,7 +47,7 @@ class Board:
                 if self.tiles[i][j] != tile:
                     self.tiles[i][j].selected = False
 
-    def redraw(self, keys):
+    def redraw(self, keys, wrong, time):
         '''Redraws board with highlighted tiles'''
         self.window.fill((255,255,255))
         self.draw_board()
@@ -63,10 +65,27 @@ class Board:
         if len(keys) != 0: #draws inputs that the user places on board but not their final value on that tile
             for value in keys:
                 self.tiles[value[0]][value[1]].display(keys[value], (20+(value[0]*60), (5+(value[1]*60))), (128, 128, 128))
+
+        if wrong > 0:
+            font = pygame.font.SysFont('Bauhaus 93', 30) #Red X
+            text = font.render('X', True, (255, 0, 0))
+            self.window.blit(text, (10, 558))
+
+            font = pygame.font.SysFont('Bahnschrift', 40) #Number of Incorrect Inputs
+            text = font.render(str(wrong), True, (0, 0, 0))
+            self.window.blit(text, (32, 545))
+
+        font = pygame.font.SysFont('Bahnschrift', 40) #Time Display
+        text = font.render(str(time), True, (0, 0, 0))
+        self.window.blit(text, (388, 545))
         pygame.display.flip()
 
-    def visualSolve(self):
+    def visualSolve(self, wrong, time):
         '''Showcases how the board is solved via backtracking'''
+        for event in pygame.event.get(): #so that touching anything doesn't freeze the screen
+            if event.type == pygame.QUIT:
+                exit()
+
         empty = self.board.find_empty()
         if not empty:
             return True
@@ -77,9 +96,9 @@ class Board:
                 self.tiles[empty[0]][empty[1]].value = nums+1
                 self.tiles[empty[0]][empty[1]].correct = True
                 pygame.time.delay(63) #show tiles at a slower rate
-                self.redraw({})
+                self.redraw({}, wrong, time)
 
-                if self.visualSolve():
+                if self.visualSolve(wrong, time):
                     return True
 
                 self.board.get_board()[empty[0]][empty[1]] = 0
@@ -87,7 +106,7 @@ class Board:
                 self.tiles[empty[0]][empty[1]].incorrect = True
                 self.tiles[empty[0]][empty[1]].correct = False
                 pygame.time.delay(63)
-                self.redraw({})
+                self.redraw({}, wrong, time)
 
 class Tile:
     '''Represents each white tile/box on the grid'''
@@ -117,7 +136,8 @@ class Tile:
 
 def main():
     '''Runs the main Sudoku GUI/Game'''
-    screen = pygame.display.set_mode((540, 540))
+    wrong = 0
+    screen = pygame.display.set_mode((540, 590))
     screen.fill((255, 255, 255))
     pygame.display.set_caption("Sudoku Solver")
     icon = pygame.image.load("icon.png")
@@ -128,7 +148,10 @@ def main():
     keyDict = {}
 
     running = True
+    startTime = time.time()
     while running:
+        elapsed = time.time() - startTime
+        passedTime = time.strftime("%H:%M:%S", time.gmtime(elapsed))
         if board.board.get_board() == board.solvedBoard.get_board(): #user has solved the board
             for i in range(9):
                 for j in range(9):
@@ -184,6 +207,7 @@ def main():
                     elif event.key == pygame.K_RETURN:
                         if selected in keyDict:
                             if keyDict[selected] != board.solvedBoard.get_board()[selected[1]][selected[0]]: #clear tile when incorrect value is inputted
+                                wrong += 1
                                 board.tiles[selected[1]][selected[0]].value = 0
                                 del keyDict[selected]
                                 break
@@ -197,15 +221,15 @@ def main():
                         for j in range(9):
                             board.tiles[i][j].selected = False
                     keyDict = {}  # clear keyDict out
-                    board.redraw(keyDict)
-                    board.visualSolve()
+                    board.redraw(keyDict, wrong, passedTime)
+                    board.visualSolve(wrong, passedTime)
                     for i in range(9):
                         for j in range(9):
                             board.tiles[i][j].correct = False
                             board.tiles[i][j].incorrect = False #reset tiles
                     running = False
 
-        board.redraw(keyDict)
+        board.redraw(keyDict, wrong, passedTime)
 
     while True: #another running loop so that the program ONLY closes when user closes program
         for event in pygame.event.get():
