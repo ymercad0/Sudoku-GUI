@@ -1,25 +1,15 @@
-from sudoku_alg import Sudoku
+from sudoku_alg import generate
 from sys import exit
+from copy import deepcopy
 import pygame
 import time
 pygame.init()
-
 class Board:
     '''A sudoku board made out of Tiles'''
     def __init__(self, window):
-        self.board = Sudoku([
-        [0, 3, 0, 0, 1, 0, 0, 6, 0],
-        [0, 2, 0, 0, 0, 4, 0, 0, 0],
-        [1, 0, 0, 0, 0, 3, 5, 0, 0],
-        [3, 0, 0, 0, 9, 0, 0, 0, 0],
-        [8, 6, 0, 0, 0, 0, 0, 4, 1],
-        [0, 0, 0, 0, 7, 0, 0, 0, 8],
-        [0, 0, 5, 9, 0, 0, 0, 0, 2],
-        [0, 0, 0, 1, 0, 0, 0, 9, 0],
-        [0, 4, 0, 0, 8, 0, 0, 5, 0]
-    ])
-        self.solvedBoard = Sudoku([row[:] for row in self.board.get_board()])
-        self.solvedBoard.solve() #so that self.board isn't modified
+        self.board = generate()
+        self.solvedBoard = deepcopy(self.board)
+        self.solvedBoard.solve()
         self.tiles = [[Tile(self.board.get_board()[i][j], window, i*60, j*60) for j in range(9)] for i in range(9)]
         self.window = window
 
@@ -69,15 +59,15 @@ class Board:
         if wrong > 0:
             font = pygame.font.SysFont('Bauhaus 93', 30) #Red X
             text = font.render('X', True, (255, 0, 0))
-            self.window.blit(text, (10, 558))
+            self.window.blit(text, (10, 554))
 
             font = pygame.font.SysFont('Bahnschrift', 40) #Number of Incorrect Inputs
             text = font.render(str(wrong), True, (0, 0, 0))
-            self.window.blit(text, (32, 545))
+            self.window.blit(text, (32, 542))
 
         font = pygame.font.SysFont('Bahnschrift', 40) #Time Display
         text = font.render(str(time), True, (0, 0, 0))
-        self.window.blit(text, (388, 545))
+        self.window.blit(text, (388, 542))
         pygame.display.flip()
 
     def visualSolve(self, wrong, time):
@@ -125,7 +115,7 @@ class Tile:
     def display(self, value, position, color):
         '''Displays a number on that tile'''
         font = pygame.font.SysFont('lato', 40)
-        text = font.render(str(value), True, color) #True = antialiasing
+        text = font.render(str(value), True, color)
         self.window.blit(text, position)
 
     def clicked(self, mousePos):
@@ -139,10 +129,21 @@ def main():
     wrong = 0
     screen = pygame.display.set_mode((540, 590))
     screen.fill((255, 255, 255))
-    pygame.display.set_caption("Sudoku Solver")
+    pygame.display.set_caption("Sudoku")
     icon = pygame.image.load("icon.png")
     pygame.display.set_icon(icon)
 
+    #loading screen when generating grid
+    font = pygame.font.SysFont('Bahnschrift', 40)
+    text = font.render("Generating", True, (0, 0, 0))
+    screen.blit(text, (175, 245))
+
+    font = pygame.font.SysFont('Bahnschrift', 40)
+    text = font.render("Grid", True, (0, 0, 0))
+    screen.blit(text, (230, 290))
+    pygame.display.flip()
+
+    #initiliaze values and variables
     board = Board(screen)
     selected = -1,-1 #NoneType error when selected = None, easier to just format as a tuple whose value will never be used
     keyDict = {}
@@ -152,6 +153,7 @@ def main():
     while running:
         elapsed = time.time() - startTime
         passedTime = time.strftime("%H:%M:%S", time.gmtime(elapsed))
+
         if board.board.get_board() == board.solvedBoard.get_board(): #user has solved the board
             for i in range(9):
                 for j in range(9):

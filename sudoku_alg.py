@@ -1,3 +1,33 @@
+import random
+from copy import deepcopy
+def generate():
+    '''Randomly generates a Sudoku grid/board'''
+    while True:  #return will interrupt the loop
+        board = Sudoku([ #recursion is really slow and inneficient
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ])
+        # puts one random number, then solves the board to generate a board
+        for i in range(9):
+            for j in range(9):
+                if random.randint(1, 10) >= 5:
+                    board.board[i][j] = random.randint(1, 9)  #plug in random number at random spot
+                    if board.valid((i, j), board.board[i][j]):
+                        continue
+                    else:
+                        board.board[i][j] = 0
+
+        partialBoard = deepcopy(board) #copies board without being modified after .solve is called
+        if board.solve():
+            return partialBoard
+
 class Sudoku:
     '''Initialize a board represented by ints as a 2D Array'''
     def __init__ (self, board):
@@ -25,7 +55,7 @@ class Sudoku:
         for i in range (9):
             for j in range (9):
                 if self.board[i][j] == 0:
-                    return (i,j)
+                    return i,j
 
     def valid(self, pos, num):
         '''Whether a number is valid in that cell, returns a bool'''
@@ -46,7 +76,7 @@ class Sudoku:
         return True
 
     def get_board(self):
-        '''Returns the board not as an instance of Sudoku but as a 2D array for easy access'''
+        '''Returns the board not as an instance of Sudoku but as a 2D array'''
         return self.board
 
     def solve(self):
@@ -61,21 +91,10 @@ class Sudoku:
 
                 if self.solve(): #recursive step
                     return True
-
                 self.board[empty[0]][empty[1]] = 0 #this number is wrong so we set it back to 0
         return False
 
 if __name__ == '__main__':
-    board = Sudoku([
-        [0, 3, 0, 0, 1, 0, 0, 6, 0],
-        [0, 2, 0, 0, 0, 4, 0, 0, 0],
-        [1, 0, 0, 0, 0, 3, 5, 0, 0],
-        [3, 0, 0, 0, 9, 0, 0, 0, 0],
-        [8, 6, 0, 0, 0, 0, 0, 4, 1],
-        [0, 0, 0, 0, 7, 0, 0, 0, 8],
-        [0, 0, 5, 9, 0, 0, 0, 0, 2],
-        [0, 0, 0, 1, 0, 0, 0, 9, 0],
-        [0, 4, 0, 0, 8, 0, 0, 5, 0]
-    ])
+    board = generate()
     board.solve()
-    board.print_board() 
+    board.print_board()
