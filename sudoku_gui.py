@@ -1,16 +1,47 @@
-from sudoku_alg import generate
+from sudoku_alg import valid, solve, find_empty
 from sys import exit
 from copy import deepcopy
 import pygame
 import time
+import random
 pygame.init()
+def generate():
+    '''Randomly generates a Sudoku grid/board'''
+    while True:  #return will interrupt the loop
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+        board = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+        # puts one random number, then solves the board to generate a board
+        for i in range(9):
+            for j in range(9):
+                if random.randint(1, 10) >= 5:
+                    board[i][j] = random.randint(1, 9)  #plug in random number at random spot
+                    if valid(board, (i, j), board[i][j]):
+                        continue
+                    else:
+                        board[i][j] = 0
+
+        partialBoard = deepcopy(board) #copies board without being modified after solve is called
+        if solve(board):
+            return partialBoard
 class Board:
     '''A sudoku board made out of Tiles'''
     def __init__(self, window):
         self.board = generate()
         self.solvedBoard = deepcopy(self.board)
-        self.solvedBoard.solve()
-        self.tiles = [[Tile(self.board.get_board()[i][j], window, i*60, j*60) for j in range(9)] for i in range(9)]
+        solve(self.solvedBoard)
+        self.tiles = [[Tile(self.board[i][j], window, i*60, j*60) for j in range(9)] for i in range(9)]
         self.window = window
 
     def draw_board(self):
@@ -76,13 +107,13 @@ class Board:
             if event.type == pygame.QUIT:
                 exit()
 
-        empty = self.board.find_empty()
+        empty = find_empty(self.board)
         if not empty:
             return True
 
         for nums in range(9):
-            if self.board.valid((empty[0],empty[1]), nums+1):
-                self.board.get_board()[empty[0]][empty[1]] = nums+1
+            if valid(self.board, (empty[0],empty[1]), nums+1):
+                self.board[empty[0]][empty[1]] = nums+1
                 self.tiles[empty[0]][empty[1]].value = nums+1
                 self.tiles[empty[0]][empty[1]].correct = True
                 pygame.time.delay(63) #show tiles at a slower rate
@@ -91,7 +122,7 @@ class Board:
                 if self.visualSolve(wrong, time):
                     return True
 
-                self.board.get_board()[empty[0]][empty[1]] = 0
+                self.board[empty[0]][empty[1]] = 0
                 self.tiles[empty[0]][empty[1]].value = 0
                 self.tiles[empty[0]][empty[1]].incorrect = True
                 self.tiles[empty[0]][empty[1]].correct = False
@@ -154,7 +185,7 @@ def main():
         elapsed = time.time() - startTime
         passedTime = time.strftime("%H:%M:%S", time.gmtime(elapsed))
 
-        if board.board.get_board() == board.solvedBoard.get_board(): #user has solved the board
+        if board.board == board.solvedBoard: #user has solved the board
             for i in range(9):
                 for j in range(9):
                     board.tiles[i][j].selected = False
@@ -173,7 +204,7 @@ def main():
                             board.deselect(board.tiles[i][j]) #deselects every tile except the one currently clicked
 
             elif event.type == pygame.KEYDOWN:
-                if board.board.get_board()[selected[1]][selected[0]] == 0 and selected != (-1,-1):
+                if board.board[selected[1]][selected[0]] == 0 and selected != (-1,-1):
                     if event.key == pygame.K_1:
                         keyDict[selected] = 1
 
@@ -208,14 +239,14 @@ def main():
 
                     elif event.key == pygame.K_RETURN:
                         if selected in keyDict:
-                            if keyDict[selected] != board.solvedBoard.get_board()[selected[1]][selected[0]]: #clear tile when incorrect value is inputted
+                            if keyDict[selected] != board.solvedBoard[selected[1]][selected[0]]: #clear tile when incorrect value is inputted
                                 wrong += 1
                                 board.tiles[selected[1]][selected[0]].value = 0
                                 del keyDict[selected]
                                 break
                             #valid and correct entry into cell
                             board.tiles[selected[1]][selected[0]].value = keyDict[selected] #assigns current grid value
-                            board.board.get_board()[selected[1]][selected[0]] = keyDict[selected] #assigns to actual board so that the correct value can't be modified
+                            board.board[selected[1]][selected[0]] = keyDict[selected] #assigns to actual board so that the correct value can't be modified
                             del keyDict[selected]
 
                 if event.key == pygame.K_SPACE:
