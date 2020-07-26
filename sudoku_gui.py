@@ -1,6 +1,6 @@
 from sudoku_alg import valid, solve, find_empty
-from sys import exit
 from copy import deepcopy
+from sys import exit
 import pygame
 import time
 import random
@@ -12,7 +12,6 @@ def generate():
             if event.type == pygame.QUIT:
                 exit()
         board = [[0 for i in range(9)] for j in range (9)]
-
         # puts one random number, then solves the board to generate a board
         for i in range(9):
             for j in range(9):
@@ -22,7 +21,6 @@ def generate():
                         continue
                     else:
                         board[i][j] = 0
-
         partialBoard = deepcopy(board) #copies board without being modified after solve is called
         if solve(board):
             return partialBoard
@@ -120,6 +118,20 @@ class Board:
                 pygame.time.delay(63)
                 self.redraw({}, wrong, time)
 
+    def hint(self, keys):
+        '''Shows a random empty tile's solved value as a hint'''
+        while True: #keeps generating i,j coords until it finds a valid random spot
+            i = random.randint(0, 8)
+            j = random.randint(0, 8)
+            if self.board[i][j] == 0: #hint spot has to be empty
+                if (j,i) in keys:
+                    del keys[(j,i)]
+                self.board[i][j] = self.solvedBoard[i][j]
+                self.tiles[i][j].value = self.solvedBoard[i][j]
+                return True
+
+            elif self.board == self.solvedBoard:
+                return False
 class Tile:
     '''Represents each white tile/box on the grid'''
     def __init__(self, value, window, x1, y1):
@@ -148,7 +160,6 @@ class Tile:
 
 def main():
     '''Runs the main Sudoku GUI/Game'''
-    wrong = 0
     screen = pygame.display.set_mode((540, 590))
     screen.fill((255, 255, 255))
     pygame.display.set_caption("Sudoku")
@@ -166,10 +177,10 @@ def main():
     pygame.display.flip()
 
     #initiliaze values and variables
+    wrong = 0
     board = Board(screen)
     selected = -1,-1 #NoneType error when selected = None, easier to just format as a tuple whose value will never be used
     keyDict = {}
-
     running = True
     startTime = time.time()
     while running:
@@ -240,6 +251,9 @@ def main():
                             board.board[selected[1]][selected[0]] = keyDict[selected] #assigns to actual board so that the correct value can't be modified
                             del keyDict[selected]
 
+                if event.key == pygame.K_h:
+                    board.hint(keyDict)
+
                 if event.key == pygame.K_SPACE:
                     for i in range(9):
                         for j in range(9):
@@ -253,7 +267,6 @@ def main():
                     running = False
 
         board.redraw(keyDict, wrong, passedTime)
-
     while True: #another running loop so that the program ONLY closes when user closes program
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
