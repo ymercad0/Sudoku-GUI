@@ -36,7 +36,7 @@ In order to run the program, the following is required:
 Pygame can simply be installed from the command prompt by
 running `pip install pygame` *or* `py -3.4 -m pip install pygame`
 where `-3.4` should be replaced with your current version of Python. Alternatively,
-you could download Pygame directly from their website.
+you could download Pygame directly from their website (check the link under this project's About).
 
 ## Downloading and running
 After downloading and extracting the zip from the [releases][6] page, double
