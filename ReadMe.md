@@ -5,13 +5,12 @@
 Sudoku game written in Python with the Pygame library 
 to visualize the backtracking algorithm. 
 
-Every time the program is run, a random, solvable board is created
+Every time the program is executed, a random, solvable board is created
 and the user can attempt to solve it by clicking on the cells.
-Entering a number into a grid will be entered as a tentative value. 
-once the the user is sure that number is the correct entry, pressing the
+Entering a number into a cell will be entered as a tentative value. 
+Once the the user is sure that the inputted number is the correct entry, pressing the
 enter key will attempt to input the number onto the board. Correct
-answers will be permanently displayed while incorrect answers will be removed
-and the incorrect counter shall begin to be displayed. Likewise,
+answers will be permanently displayed while incorrect answers will be removed. Likewise,
 values can be removed by pressing on the backspace or delete keys.
 ![Example 1][4]
 
