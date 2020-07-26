@@ -1,4 +1,4 @@
-#Sudoku
+# Sudoku
 
 ![PyGame][1] ![Python][2] ![License][3]
 
@@ -20,15 +20,15 @@ This will commence a visual that demonstrates how the backtracking algorithm
 is being applied in order to solve the board.
 ![Example 2][5]
 
-##Controls
-| Keys      | Actions                                            |
-|-----------|----------------------------------------------------|
-| `Left Click`   |Enters a value into that cell                  |
-| `Backspace/Delete` | Deletes the number in that cell           |
-| `Space`     | Solves the board via a backtracking algorithm visualizer|
-| `h`       | Gives user a hint. Displays a random correct value on the board   |
+## Controls
+| Keys              | Actions                                                        |
+|-------------------|----------------------------------------------------------------|
+| `Left Click`      |Enters a value into that cell                                   |
+| `Backspace/Delete`| Deletes the number in that cell                                |
+| `Space`           | Solves the board via a backtracking algorithm visualizer       |
+| `h`               | Gives user a hint. Displays a random correct value on the board|
 
-##Requirements
+## Requirements
 In order to run the program, the following is required:
 * Python 3 
 * Pygame
@@ -38,7 +38,7 @@ running `pip install pygame` *or* `py -3.4 -m pip install pygame`
 where `-3.4` should be replaced with your current version of Python. Alternatively,
 you could download Pygame directly from their website.
 
-##Downloading and running
+## Downloading and running
 After downloading and extracting the zip from the [releases][6] page, double
 click on `sudoku_gui.py` to run the program. Alternatively, open it from an
 IDE of choice.
