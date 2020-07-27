@@ -46,7 +46,7 @@ class Board:
                 self.tiles[i][j].draw((0,0,0), 1)
 
                 if self.tiles[i][j].value != 0: #don't draw 0s on the grid
-                    self.tiles[i][j].display(self.tiles[i][j].value, (20+(j*60), (5+(i*60))), (0, 0, 0))  #20,5 are the coordinates of the first tile
+                    self.tiles[i][j].display(self.tiles[i][j].value, (21+(j*60), (16+(i*60))), (0, 0, 0))  #20,5 are the coordinates of the first tile
         #bottom-most line
         pygame.draw.line(self.window, (0, 0, 0), (0, ((i+1) // 3) * 180), (540, ((i+1) // 3) * 180), 4)
 
@@ -74,7 +74,7 @@ class Board:
 
         if len(keys) != 0: #draws inputs that the user places on board but not their final value on that tile
             for value in keys:
-                self.tiles[value[0]][value[1]].display(keys[value], (20+(value[0]*60), (5+(value[1]*60))), (128, 128, 128))
+                self.tiles[value[0]][value[1]].display(keys[value], (21+(value[0]*60), (16+(value[1]*60))), (128, 128, 128))
 
         if wrong > 0:
             font = pygame.font.SysFont('Bauhaus 93', 30) #Red X
@@ -148,7 +148,7 @@ class Tile:
 
     def display(self, value, position, color):
         '''Displays a number on that tile'''
-        font = pygame.font.SysFont('lato', 40)
+        font = pygame.font.SysFont('lato', 45)
         text = font.render(str(value), True, color)
         self.window.blit(text, position)
 
